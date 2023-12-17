@@ -7,26 +7,36 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    user_name = Column(String(30), nullable=False, unique=True)
+    password = Column(String(30), nullable=False, unique=False)
+    email = Column(String(60), nullable=False, unique=True)
+    name = Column(String(30), nullable=False, unique=False)
+    last_name = Column(String(30), nullable=False, unique=False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Followers(Base):
+    __tablename__ = 'followers'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    followed = Column(Integer, nullable=False, unique=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship('User', back_populates='followers')
 
-    def to_dict(self):
-        return {}
+class Post(Base):
+    __tablename__ = 'post'
+    id = Column(Integer, primary_key=True)
+    type = Column(String(30), nullable=False, unique=False)
+    likes = Column(Integer, nullable=False, unique=False)
+    user_id = Column(Integer, ForeignKey ('user.id'))
+    user = relationship('User', back_populates='post')
+
+class Comments(Base):
+    __tablename__ = 'comments'
+    id = Column(Integer, primary_key=True, nullable=False)
+    text = Column(String(250), nullable=False)
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship('Post', back_populates='comments')
 
 ## Draw from SQLAlchemy base
 try:
